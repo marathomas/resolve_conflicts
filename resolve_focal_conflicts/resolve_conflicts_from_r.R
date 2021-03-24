@@ -1,31 +1,32 @@
 # RESOLVE_FOCAL_CONFLICTS
 
 ## ABOUT
+
 # This script identifies calls that are currently not labelled as nonfocal, but 
 # may actually be nonfocal. It is a wrapper for a pipeline of python scripts (jupyter
 # notebooks, originally).
 
 ## DETAILED DESCRIPTION
-# First, potential mislabelled calls are identified as calls that are very close
-# in time and neither is labelled as nonfocal.These calls are pulled from 
-# the dataset (01_identify_focal_conflicts.py) and identified to be the same call 
-# or a different call based on comparison of spectrograms (02_assign_distance_score.py). 
 
-# In same-call pairs or groups, the strongest call label remains focal and the 
-# others are re-assigned to be nonfocal (Strength=intensity of the audio signal, 
-# 03_resolve_conflicts.py).
+# First, potential mislabelled calls are identified as calls that are very close
+# in time and of which none are labelled as nonfocal.These calls are pulled from 
+# the dataset (01_identify_focal_conflicts.py) and their similarity is assessed 
+# based on comparison of spectrograms (02_assign_distance_score.py). 
+# In high-similarity pairs or groups, the stronger/strongest call label remains focal 
+# and the other(s) are re-assigned to be nonfocal (Strength=intensity of the audio 
+# signal, 03_resolve_conflicts.py).
 # Lastly, the csv label files are updated to include the column "pred_focalType",
 # which contains the updated labels (04_update_labelfiles.py).
 
 ## REQUIREMENTS
+
 # Requirements are: 
-# - the original labelfiles in EAS_shared/meerkat/working/processed/acoustic/total_synched_call_tables
+# - the original labelfiles csvs in EAS_shared/meerkat/working/processed/acoustic/total_synched_call_tables
 # - call txts in EAS_shared/meerkat/working/processed/acoustic/extract_calls/txts/
 # - a labelfile of ALL calls (labelfile.csv) in EAS_shared/meerkat/working/processed/acoustic/extract_calls/
-#   (generated when generating txt call files)
-
 
 ## OUTPUT
+
 # All output is saved in EAS_shared/meerkat/working/processed/acoustic/resolve_conflicts/
 
 # - candidates_matches.json
@@ -36,7 +37,6 @@
 
 # All except the last one could be theoretically deleted but I would keep it, because it allows
 # us to see what was done in the different steps of the pipeline.
-
 
 
 # **********************************************************
@@ -59,13 +59,14 @@ write(SERVER, 'server_path.txt', sep="")
 
 # Force reticulate to use the python version and environment 
 # I uploaded on the server
-
 # (Solution from https://github.com/rstudio/reticulate/issues/292)
-ENV_PATH = os$path$join(os$path$sep, SERVER, 'EAS_shared',
-                            'meerkat','working','processed',
-                            'acoustic', 'resolve_conflicts', 'resolver_env', 'bin', 'python') 
 
-Sys.setenv(RETICULATE_PYTHON = ENV_PATH)
+env_path = file.path(SERVER, 'EAS_shared',
+                     'meerkat','working','processed',
+                     'acoustic', 'resolve_conflicts', 'resolver_env', 'bin', 'python',
+                     fsep = .Platform$file.sep)
+
+Sys.setenv(RETICULATE_PYTHON = env_path)
 
 library(reticulate)
 

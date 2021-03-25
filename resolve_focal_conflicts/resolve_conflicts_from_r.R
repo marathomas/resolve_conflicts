@@ -21,7 +21,7 @@
 ## REQUIREMENTS
 
 # Requirements are: 
-# - the original labelfiles csvs in EAS_shared/meerkat/working/processed/acoustic/total_synched_call_tables
+# - the original labelfiles csvs in EAS_shared/meerkat/working/processed/acoustic/total_synched_call_tables/
 # - call txts in EAS_shared/meerkat/working/processed/acoustic/extract_calls/txts/
 # - a labelfile of ALL calls (labelfile.csv) in EAS_shared/meerkat/working/processed/acoustic/extract_calls/
 
@@ -43,7 +43,14 @@
 # START HERE
 # **********************************************************
 
+# ***  0) Load environment  ***
+
+# should already be synchronized with lockfile but just in case:
+library(renv)
+renv::restore()
+
 # ***  1) Define server path   ***
+
 
 # Indicate your path to EAS server
 # (depends on how you mounted it and what OS you're working on)
@@ -63,12 +70,21 @@ write(SERVER, 'server_path.txt', sep="")
 
 env_path = file.path(SERVER, 'EAS_shared',
                      'meerkat','working','processed',
-                     'acoustic', 'resolve_conflicts', 'resolver_env', 'bin', 'python',
+                     'acoustic', 'resolve_conflicts', 'resolver_env',
                      fsep = .Platform$file.sep)
 
-Sys.setenv(RETICULATE_PYTHON = env_path)
+py_path = file.path(SERVER, 'EAS_shared',
+                    'meerkat','working','processed',
+                    'acoustic', 'resolve_conflicts', 'resolver_env', 'bin', 'python3.7m',
+                    fsep = .Platform$file.sep)
+
+#py_path = "/Users/marathomas/opt/anaconda3/envs/resolver_env/bin/python3.7m"
+#env_path = "/Users/marathomas/opt/anaconda3/envs/resolver_env"
+
+Sys.setenv(RETICULATE_PYTHON = py_path)
 
 library(reticulate)
+reticulate::py_config()
 
 # select environment
 reticulate::use_condaenv("resolver_env", required = TRUE)
@@ -79,8 +95,8 @@ reticulate::py_config()
 
 os = import("os")
 PROJECT_HOME = os$path$join(os$path$sep, SERVER, 'EAS_shared',
-                                     'meerkat','working','processed',
-                                     'acoustic', 'resolve_conflicts')
+                            'meerkat','working','processed',
+                            'acoustic', 'resolve_conflicts')
 
 # may wanna run one by one
 py_run_file(os$path$join(os$path$sep, PROJECT_HOME, "01_identify_focal_conflicts.py"))
@@ -90,4 +106,3 @@ py_run_file(os$path$join(os$path$sep, PROJECT_HOME, "04_update_labelfiles.py"))
 
 # Clean up
 file.remove('server_path.txt')
-
